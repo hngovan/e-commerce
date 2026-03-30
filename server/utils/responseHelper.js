@@ -96,8 +96,8 @@ const paginationResponse = (res, data, pagination, message = "Success") => {
       limit: pagination.limit,
       total: pagination.total,
       totalPages: pagination.totalPages,
-      hasNext: pagination.page < pagination.totalPages,
-      hasPrev: pagination.page > 1,
+      // hasNext: pagination.page < pagination.totalPages,
+      // hasPrev: pagination.page > 1,
     },
   };
 
