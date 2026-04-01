@@ -22,10 +22,12 @@ const categorySchema = new mongoose.Schema(
       type: String,
       trim: true,
       maxlength: [500, "Description must not exceed 500 characters"],
+      default: "",
     },
     image: {
       type: String,
       trim: true,
+      default: "",
     },
     isActive: {
       type: Boolean,
@@ -39,7 +41,7 @@ const categorySchema = new mongoose.Schema(
   },
 );
 
-// Virtual for product count
+// Virtual for product count (optional, can be populated)
 categorySchema.virtual("productCount", {
   ref: "Product",
   localField: "_id",

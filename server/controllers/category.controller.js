@@ -78,7 +78,7 @@ const getAllCategories = asyncHandler(async (req, res) => {
         ...category.toObject(),
         productCount,
       };
-    })
+    }),
   );
 
   const pagination = {
@@ -180,11 +180,10 @@ const updateCategory = asyncHandler(async (req, res) => {
   }
 
   // Update category
-  const updatedCategory = await Category.findByIdAndUpdate(
-    id,
-    updateData,
-    { new: true, runValidators: true }
-  );
+  const updatedCategory = await Category.findByIdAndUpdate(id, updateData, {
+    new: true,
+    runValidators: true,
+  });
 
   return successResponse(
     res,

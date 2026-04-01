@@ -61,23 +61,26 @@ const productSchema = new mongoose.Schema(
         message: "Color must be one of: " + ALLOWED_COLORS.join(", "),
       },
     },
-    ratings: [
-      {
-        star: {
-          type: Number,
-          min: 1,
-          max: 5,
+    ratings: {
+      type: [
+        {
+          star: {
+            type: Number,
+            min: 1,
+            max: 5,
+          },
+          postedBy: {
+            type: mongoose.Types.ObjectId,
+            ref: "User",
+          },
+          comment: {
+            type: String,
+            maxlength: [500, "Comment must not exceed 500 characters"],
+          },
         },
-        postedBy: {
-          type: mongoose.Types.ObjectId,
-          ref: "User",
-        },
-        comment: {
-          type: String,
-          maxlength: [500, "Comment must not exceed 500 characters"],
-        },
-      },
-    ],
+      ],
+      default: [],
+    },
     totalRatings: {
       type: Number,
       default: 0,
@@ -93,14 +96,22 @@ const productSchema = new mongoose.Schema(
 
 // Virtual for average rating
 productSchema.virtual("averageRating").get(function () {
-  if (this.ratings.length === 0) return 0;
+  if (
+    !this.ratings ||
+    !Array.isArray(this.ratings) ||
+    this.ratings.length === 0
+  ) {
+    return 0;
+  }
   const sum = this.ratings.reduce((acc, rating) => acc + rating.star, 0);
-  return (sum / this.ratings.length).toFixed(1);
+  return Number((sum / this.ratings.length).toFixed(1));
 });
 
 // Virtual for available quantity
 productSchema.virtual("availableQuantity").get(function () {
-  return this.quantity - this.sold;
+  const quantity = this.quantity || 0;
+  const sold = this.sold || 0;
+  return quantity - sold;
 });
 
 module.exports = mongoose.model("Product", productSchema);
