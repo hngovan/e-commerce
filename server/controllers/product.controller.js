@@ -270,13 +270,21 @@ const searchProducts = asyncHandler(async (req, res) => {
     if (maxPrice) query.price.$lte = Number(maxPrice);
   }
 
-  const { data, pagination } = await getPaginatedData(Product, req, {
+  const { data, pagination, sort } = await getPaginatedData(Product, req, {
     defaultLimit: 10,
     maxLimit: 50,
     defaultSort: { createdAt: -1 },
     populate: { path: "category", select: "name slug" },
     select: "-__v",
     filter: query,
+    allowedSortFields: [
+      "title",
+      "price",
+      "createdAt",
+      "sold",
+      "quantity",
+      "totalRatings",
+    ],
   });
 
   return paginationResponse(
@@ -284,6 +292,7 @@ const searchProducts = asyncHandler(async (req, res) => {
     data,
     pagination,
     "Products retrieved successfully",
+    sort,
   );
 });
 

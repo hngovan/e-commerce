@@ -42,6 +42,23 @@ const getSortParams = (query, defaultSort = { createdAt: -1 }) => {
 };
 
 /**
+ * Get sort options for response (human readable)
+ * @param {Object} query - Express request query object
+ * @returns {Object} Sort options
+ */
+const getSortOptions = (query) => {
+  if (!query.sort) return { field: "createdAt", order: "desc" };
+
+  const sortFields = query.sort.split(",");
+  const options = sortFields.map((field) => ({
+    field: field.replace(/^-/, ""),
+    order: field.startsWith("-") ? "desc" : "asc",
+  }));
+
+  return options;
+};
+
+/**
  * Build pagination metadata
  * @param {number} page - Current page
  * @param {number} limit - Items per page
@@ -127,11 +144,22 @@ const getPaginatedData = async (model, req, options = {}) => {
     populate = null,
     select = null,
     filter = {},
+    allowedSortFields = [],
   } = options;
 
   // Get pagination params
   const pagination = getPaginationParams(req.query, defaultLimit, maxLimit);
-  const sort = getSortParams(req.query, defaultSort);
+
+  // Validate sort fields if allowedSortFields provided
+  let sort = getSortParams(req.query, defaultSort);
+  if (allowedSortFields.length > 0) {
+    const invalidFields = Object.keys(sort).filter(
+      (field) => !allowedSortFields.includes(field),
+    );
+    if (invalidFields.length > 0) {
+      sort = defaultSort;
+    }
+  }
 
   // Merge filter with query params if needed
   const query = { ...filter };
@@ -156,12 +184,14 @@ const getPaginatedData = async (model, req, options = {}) => {
   return {
     data,
     pagination: paginationMeta,
+    sort: getSortOptions(req.query),
   };
 };
 
 module.exports = {
   getPaginationParams,
   getSortParams,
+  getSortOptions,
   buildPaginationMeta,
   executePaginatedQuery,
   getPaginatedData,

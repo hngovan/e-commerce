@@ -85,7 +85,13 @@ const noContentResponse = (res) => {
  * @param {Object} pagination - Pagination info
  * @param {string} message - Success message
  */
-const paginationResponse = (res, data, pagination, message = "Success") => {
+const paginationResponse = (
+  res,
+  data,
+  pagination,
+  message = "Success",
+  sort = null,
+) => {
   const response = {
     success: true,
     status: HTTP_STATUS.OK,
@@ -96,10 +102,14 @@ const paginationResponse = (res, data, pagination, message = "Success") => {
       limit: pagination.limit,
       total: pagination.total,
       totalPages: pagination.totalPages,
-      // hasNext: pagination.page < pagination.totalPages,
-      // hasPrev: pagination.page > 1,
+      hasNext: pagination.page < pagination.totalPages,
+      hasPrev: pagination.page > 1,
     },
   };
+
+  if (sort) {
+    response.sort = sort;
+  }
 
   return res.status(HTTP_STATUS.OK).json(response);
 };
