@@ -158,7 +158,7 @@ const updateProduct = asyncHandler(async (req, res) => {
 
   // Update product
   const updatedProduct = await Product.findByIdAndUpdate(pid, updateData, {
-    new: true,
+    returnDocument: "after",
     runValidators: true,
   }).populate("category", "name slug");
 
